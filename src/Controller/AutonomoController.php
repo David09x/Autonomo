@@ -95,11 +95,108 @@ class AutonomoController extends AbstractController
         ];
         }else{
             $response = [
-                'ok' => $anyadirCita
+                'ok' => false
             ];
         }
 
         
+        return new JsonResponse($response);
+    }
+
+    //#[Route('/fechaBuena/{fecha}', name: 'fecha')]
+    public function obtenerFecha($fecha)
+    {
+        
+        if (preg_match('/^\d{2}-\d{2}-\d{4}$/', $fecha)) {
+            
+            $fecha_formateada = str_replace('-', '', $fecha);
+            
+            // Dividir la fecha en partes
+            $partes_fecha = explode('-', $fecha_formateada);
+            
+            $anyo = substr($partes_fecha[0],4,4);
+            $mes = substr($partes_fecha[0],2,2);
+            $dia = substr($partes_fecha[0],0,2);
+
+            $fecha_final = $anyo.$mes.$dia;
+           
+            
+            
+        } else {
+            $fecha_final =  false;
+        }
+
+        $response = [
+            'fecha' => $fecha_final
+        ];
+        
+    
+        return $response;
+    } 
+
+    #[Route('/mostrarCitasFecha/{fecha}', name: 'cita-dia')]
+    public function mostrarCitas(ManagerRegistry $doctrine,$fecha): JsonResponse{
+
+        $fechaBuena = $this->obtenerFecha($fecha);
+
+        $citasBuscadas =   $doctrine->getRepository(Citas::class)->obtenerCitaFecha($fechaBuena['fecha']);
+
+        if(count($citasBuscadas) > 0){
+
+            $response = [
+                'fecha' => $citasBuscadas
+            ];
+        }else{
+            $response =  'no hay citas';
+        }
+
+        return new JsonResponse($response);
+
+    }
+
+    #[Route('/mostrarG/{fecha}/{fecha2}', name: 'mostrar-gastos')]
+    public function mostrarGastos(ManagerRegistry $doctrine, $fecha,$fecha2): JsonResponse
+    {
+        $fechaBuena = $this->obtenerFecha($fecha);
+        $fechaBuena2 = $this->obtenerFecha($fecha2);
+
+        $gastos = $doctrine->getRepository(Gastos::class)->calcularGastos($fechaBuena['fecha'],$fechaBuena2['fecha']);
+
+        if($gastos[0]['gastos'] != null){
+
+            $response = [
+                
+                'gastos' => $gastos[0]['gastos']
+            ];
+        }else{
+            $response = [
+                'gastos' => 0
+            ];
+        }
+
+        return new JsonResponse($response);
+    }
+
+    #[Route('/mostrarB/{fecha}/{fecha2}', name: 'mostrar-beneficios')]
+    public function mostrarBeneficios(ManagerRegistry $doctrine, $fecha,$fecha2): JsonResponse
+    {
+        $fechaBuena = $this->obtenerFecha($fecha);
+        $fechaBuena2 = $this->obtenerFecha($fecha2);
+
+        $citas = $doctrine->getRepository(Servicios::class)->calcularBeneficios($fechaBuena['fecha'],$fechaBuena2['fecha']);
+
+        if($citas[0]['beneficios'] !=  null){
+
+            $response = [
+    
+                'beneficios' => $citas[0]['beneficios']
+            ];
+        }else {
+            $response = [
+                'beneficios' => 0
+            ];
+        }
+
         return new JsonResponse($response);
     }
 

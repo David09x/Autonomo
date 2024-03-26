@@ -45,4 +45,21 @@ class ServiciosRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+    public function calcularBeneficios($fecha,$fecha2){
+        $data = array();
+        $connection = $this->getEntityManager()->getConnection();
+        try {
+            $body = "SELECT SUM(servicios.precio) beneficios FROM servicios INNER JOIN citas ON citas.idServicio = servicios.id WHERE citas.fecha BETWEEN :fecha AND :fecha2;";
+            $parameters = ['fecha' => $fecha ,  'fecha2' => $fecha2];
+            $statement = $connection->executeQuery($body,$parameters);
+            $results = $statement->fetchAll();
+
+            $data =  $results;
+            
+        }catch(\Exception $e){
+            $data = array('estado' => 'danger', 'mensaje' => $e->getMessage());
+        }
+        return $data;
+    
+    }
 }

@@ -45,4 +45,22 @@ class GastosRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+    public function calcularGastos($fecha,$fecha2){
+        $data = array();
+        $connection = $this->getEntityManager()->getConnection();
+        try {
+            $body = "SELECT SUM(precio) gastos FROM gastos WHERE fecha BETWEEN :fecha AND :fecha2; ";
+            $parameters = ['fecha' => $fecha,'fecha2' => $fecha2];
+
+            $statement = $connection->executeQuery($body,$parameters);
+            $results = $statement->fetchAll();
+
+            $data =  $results;
+
+        }catch(\Exception $e){
+            $data = array('estado' => 'danger', 'mensaje' => $e->getMessage());
+        }
+        return $data;
+    }
 }

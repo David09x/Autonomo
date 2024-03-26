@@ -68,4 +68,27 @@ class CitasRepository extends ServiceEntityRepository
         }
         return $data;
     }
+
+    public function obtenerCitaFecha($fecha)
+    {
+        $data = array();
+        $connection = $this->getEntityManager()->getConnection();
+        try {
+            $body = "SELECT cliente.nombre, citas.hora ,  servicios.tipo , servicios.precio FROM citas INNER JOIN cliente ON cliente.id = citas.idCliente 
+            INNER JOIN servicios ON servicios.id = citas.idServicio WHERE citas.fecha = :fecha;";
+            $parameters = ['fecha' => $fecha];
+
+            $statement = $connection->executeQuery($body,$parameters);
+            $results = $statement->fetchAll();
+
+            $data =  $results;
+
+        }catch(\Exception $e){
+            $data = array('estado' => 'danger', 'mensaje' => $e->getMessage());
+        }
+        return $data;
+    }
+
+   
+
 }
