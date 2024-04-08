@@ -43,39 +43,89 @@ class AutonomoController extends AbstractController
         return new JsonResponse($response);
     }
 
+    //#[Route('/buscarCliente/{telefono}', name: 'buscar-cliente')]
+    public function buscarClienteAntesDeAgregar(ManagerRegistry $doctrine, $telefono)
+    {
+        $buscarCliente = $doctrine->getRepository(Cliente::class)->buscarCliente($telefono);
+        if(count($buscarCliente) > 0){
+            $response = true;
+            
+        }else{
+            $response = false;
+           
+        }
+
+        return $response;
+    }
+    //#[Route('/buscarProveedor/{telefono}', name: 'buscar-Proveedor')]
+    public function buscarProveedorAntesDeAgregar(ManagerRegistry $doctrine,$telefono){
+
+        $buscarProveedor = $doctrine->getRepository(Proveedor::class)->buscarProveedor($telefono);
+        if(count($buscarProveedor) > 0){
+            $response = true;
+            
+            
+        }else{
+            $response =false;                       
+        }
+
+        return $response;
+    }
     #[Route('/cliente/{nombre}/{telefono}', name: 'clientes-anyadir')]
     public function anyadirC(ManagerRegistry $doctrine, $nombre,$telefono): JsonResponse
     {
-        $anyadirCliente =  $doctrine->getRepository(Cliente::class)->anyadirCliente($nombre,$telefono);
 
-        if($anyadirCliente){
+        $antesDeMeterBuscar = $this->buscarClienteAntesDeAgregar($doctrine,$telefono);
+        
+        if(!$antesDeMeterBuscar){
+            
+            $anyadirCliente =  $doctrine->getRepository(Cliente::class)->anyadirCliente($nombre,$telefono);
+            if($anyadirCliente){
 
-        $response = [
-            'ok' => true
-        ];
+                $response = [
+                'ok' => true,
+                'descripcion' => 'Usuario agregado con exito'
+                ];
+            }else{
+                $response = [
+                    'ok' => false
+                ];
+            }  
         }else{
             $response = [
-                'ok' => false
+                'ok' => false,
+                'descripcion' => 'Estas intentando agregar un usuario que tiene el mismo numero de telefono que otro usuario'
             ];
         }
-
         
         return new JsonResponse($response);
     }
 
+    
+
     #[Route('/proveedor/{nombre}/{telefono}', name: 'proveedor-anyadir')]
     public function anyadirP(ManagerRegistry $doctrine, $nombre,$telefono): JsonResponse
     {
-        $anyadirProveedor =  $doctrine->getRepository(Proveedor::class)->anyadirProveedor($nombre,$telefono);
 
-        if($anyadirProveedor){
+        $antesDeMeterBuscarP = $this->buscarProveedorAntesDeAgregar($doctrine,$telefono);
+        if(!$antesDeMeterBuscarP){
+            $anyadirProveedor =  $doctrine->getRepository(Proveedor::class)->anyadirProveedor($nombre,$telefono);
+            if($anyadirProveedor){
+                
+            $response = [
+                'ok' => true,
+                'descripcion' => 'Proveedor agregado con exito'
+                ];
+            }else{
+                $response = [
+                    'ok' => false
+                ];
+            }  
 
-        $response = [
-            'ok' => true
-        ];
         }else{
             $response = [
-                'ok' => false
+                'ok' => false,
+                'descripcion' => 'Estas intentando agregar un usuario que tiene el mismo numero de telefono que otro usuario'
             ];
         }
 
@@ -107,16 +157,16 @@ class AutonomoController extends AbstractController
     public function obtenerFecha($fecha)
     {
         
-        if (preg_match('/^\d{2}-\d{2}-\d{4}$/', $fecha)) {
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $fecha)) {
             
             $fecha_formateada = str_replace('-', '', $fecha);
             
             // Dividir la fecha en partes
             $partes_fecha = explode('-', $fecha_formateada);
             
-            $anyo = substr($partes_fecha[0],4,4);
-            $mes = substr($partes_fecha[0],2,2);
-            $dia = substr($partes_fecha[0],0,2);
+            $anyo = substr($partes_fecha[0],0,4);
+            $mes = substr($partes_fecha[0],4,2);
+            $dia = substr($partes_fecha[0],6,2);
 
             $fecha_final = $anyo.$mes.$dia;
            
@@ -144,10 +194,15 @@ class AutonomoController extends AbstractController
         if(count($citasBuscadas) > 0){
 
             $response = [
-                'fecha' => $citasBuscadas
+                'ok' => true,
+                'citasEncontradas' => $citasBuscadas
             ];
         }else{
-            $response =  'no hay citas';
+            
+            $response = [
+                'ok' => false
+                
+            ];
         }
 
         return new JsonResponse($response);

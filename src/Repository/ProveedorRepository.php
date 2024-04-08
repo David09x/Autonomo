@@ -64,4 +64,23 @@ class ProveedorRepository extends ServiceEntityRepository
         }
         return $data;
     }
+
+    public function buscarProveedor($telefono){
+        $data = array();
+        $connection = $this->getEntityManager()->getConnection();
+        try {
+            $body = "SELECT * FROM proveedor WHERE telefono= :telefono";
+            $parameters = ['telefono' => $telefono];
+
+            $statement = $connection->executeQuery($body,$parameters);
+            $results = $statement->fetchAll();
+
+            $data =  $results;
+            //$data  = 'OK';
+
+        }catch(\Exception $e){
+            $data = array('estado' => 'danger', 'mensaje' => $e->getMessage());
+        }
+        return $data;
+    }
 }

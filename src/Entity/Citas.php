@@ -82,8 +82,8 @@ class Citas
 
     public function __toArray(){
         $response = [
-            'idCliente' => $this->getIdCliente()->getId(),
-            'idServicio' => $this->getIdServicio()->getId(),
+            'idCliente' => $this->getIdCliente()->getNombre(),
+            'idServicio' => $this->getIdServicio()->getTipo(),
             'Hora' => $this->getHora(),
             'fecha' => $this->getFecha()
         ];
