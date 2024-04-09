@@ -62,4 +62,21 @@ class ServiciosRepository extends ServiceEntityRepository
         return $data;
     
     }
+
+    public function obtenerServicios(){
+        $data = array();
+        $connection = $this->getEntityManager()->getConnection();
+        try {
+            $body = "SELECT * FROM servicios";
+            $parameters = [];
+            $statement = $connection->executeQuery($body,$parameters);
+            $results = $statement->fetchAll();
+
+            $data =  $results;
+            
+        }catch(\Exception $e){
+            $data = array('estado' => 'danger', 'mensaje' => $e->getMessage());
+        }
+        return $data;
+    }
 }

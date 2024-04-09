@@ -83,4 +83,43 @@ class ClienteRepository extends ServiceEntityRepository
         }
         return $data;
     }
+
+    public function darIdCliente($telefono){
+        $data = array();
+        $connection = $this->getEntityManager()->getConnection();
+        try {
+            $body = "SELECT * FROM cliente WHERE telefono= :telefono";
+            $parameters = ['telefono' => $telefono];
+
+            $statement = $connection->executeQuery($body,$parameters);
+            $results = $statement->fetchAll();
+
+            $data =  $results;
+            //$data  = 'OK';
+
+        }catch(\Exception $e){
+            $data = array('estado' => 'danger', 'mensaje' => $e->getMessage());
+        }
+        return $data;
+
+    }
+
+    public function encontrarNombrePorId($id){
+        $data = array();
+        $connection = $this->getEntityManager()->getConnection();
+        try {
+            $body = "SELECT nombre FROM cliente WHERE id=:id";
+            $parameters = ['id' => $id];
+
+            $statement = $connection->executeQuery($body,$parameters);
+            $results = $statement->fetchAll();
+
+            $data =  $results;
+            //$data  = 'OK';
+
+        }catch(\Exception $e){
+            $data = array('estado' => 'danger', 'mensaje' => $e->getMessage());
+        }
+        return $data;
+    }
 }

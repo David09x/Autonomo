@@ -133,12 +133,13 @@ class AutonomoController extends AbstractController
         return new JsonResponse($response);
     }
 
-    #[Route('/citas/{idCliente}/{idServicio}', name: 'cita-anyadir')]
-    public function anyadirCita(ManagerRegistry $doctrine,$idCliente,$idServicio): JsonResponse
+    #[Route('/citas/{idCliente}/{idServicio}/{hora}/{fecha}', name: 'cita-anyadir')]
+    public function anyadirCita(ManagerRegistry $doctrine,$idCliente,$idServicio,$hora,$fecha): JsonResponse
     {
-        $anyadirCita =  $doctrine->getRepository(Citas::class)->anyadirCita($idCliente,$idServicio);
+        $convertirFecha = $this->obtenerFecha($fecha);
+        $anyadirCita =  $doctrine->getRepository(Citas::class)->anyadirCita($idCliente,$idServicio,$hora,$convertirFecha['fecha']);
 
-        if($anyadirCita){
+         if($anyadirCita){
 
         $response = [
             'ok' => $anyadirCita
@@ -148,8 +149,8 @@ class AutonomoController extends AbstractController
                 'ok' => false
             ];
         }
+    
 
-        
         return new JsonResponse($response);
     }
 
@@ -255,4 +256,60 @@ class AutonomoController extends AbstractController
         return new JsonResponse($response);
     }
 
+    #[Route('/obtenerServicios', name: 'mostrar-Servicios')]
+    public function mostrarServicios(ManagerRegistry $doctrine): JsonResponse{
+
+        $servicios = $doctrine->getRepository(Servicios::class)->obtenerServicios();
+
+       $response = [
+                'servicios' => $servicios
+            ];
+        
+        return new JsonResponse($response);
+    }
+
+    #[Route('/darClienteId/{telefono}', name: 'cliente-Id')]
+    public function obtenerElIdCliente(ManagerRegistry $doctrine,$telefono): JsonResponse{
+
+        $clienteIdBuscado = $doctrine->getRepository(Cliente::class)->darIdCliente($telefono);
+
+        if(count($clienteIdBuscado) > 0){
+            $response = [
+                        'ok' => true,
+                        'idDelCliente' => $clienteIdBuscado
+                    ];
+
+        }else{
+            $response = [
+                'ok' => false,
+                'descripcion' => 'no existe el cliente'
+            ];
+        }
+        
+        return new JsonResponse($response);
+    }
+
+    #[Route('/buscarCitaPrevia/{hora}/{fecha}', name: 'mirar-cita-previa')]
+    public function buscarCitaPrevia(ManagerRegistry $doctrine,$hora,$fecha): JsonResponse{
+        $convertirFecha2 = $this->obtenerFecha($fecha);
+        $citaP = $doctrine->getRepository(Citas::class)->comprobarCitaAntesDeAgregar($convertirFecha2['fecha'],$hora);
+        
+        if(count($citaP) > 0){
+            $buscarNombrePorId2 = $doctrine->getRepository(Cliente::class)->encontrarNombrePorId($citaP[0]['idCliente']);
+            $response = [
+                        'ok' => false,
+                        'citaPrevia' => $citaP,
+                        
+                        'descripcion' => "Ya hay una cita a esa hora y fecha de ".$buscarNombrePorId2[0]['nombre'],
+                    ];
+
+        }else{
+            $response = [
+                'ok' => true,
+                'descripcion' => 'no hay cita'
+            ];
+        }
+        
+        return new JsonResponse($response);
+    }
 }

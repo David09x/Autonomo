@@ -46,15 +46,14 @@ class CitasRepository extends ServiceEntityRepository
     //        ;
     //    }
 
-    public function anyadirCita($idCliente,$idServicio){
+    public function anyadirCita($idCliente,$idServicio,$hora,$fecha){
         $data = array();
         $connection = $this->getEntityManager()->getConnection();
 
-        $hora =  date("H:i:s");
-        $fecha =  date("Ymd");
+       
         try {
-            $body = "INSERT INTO citas (idCliente,idServicio,hora,fecha) VALUES ($idCliente,$idServicio,:hora,:fecha)";
-            $parameters = ['idCiente' => $idCliente,'idServicio' => $idServicio, 'hora' => $hora, 'fecha' => $fecha];
+            $body = "INSERT INTO citas (idCliente,idServicio,hora,fecha) VALUES (:idCliente,:idServicio,:hora,:fecha)";
+            $parameters = ['idCliente' => $idCliente,'idServicio' => $idServicio, 'hora' => $hora, 'fecha' => $fecha];
 
             $statement = $connection->executeQuery($body,$parameters);
             $results = $statement->fetchAll();
@@ -89,6 +88,23 @@ class CitasRepository extends ServiceEntityRepository
         return $data;
     }
 
+    public function comprobarCitaAntesDeAgregar($fecha,$hora){
+        $data = array();
+        $connection = $this->getEntityManager()->getConnection();
+        try {
+            $body = "SELECT * FROM citas WHERE fecha = :fecha AND hora = :hora";
+            $parameters = ['fecha' => $fecha,'hora' => $hora];
+
+            $statement = $connection->executeQuery($body,$parameters);
+            $results = $statement->fetchAll();
+
+            $data =  $results;
+
+        }catch(\Exception $e){
+            $data = array('estado' => 'danger', 'mensaje' => $e->getMessage());
+        }
+        return $data;
+    }
    
 
 }
