@@ -83,4 +83,24 @@ class ProveedorRepository extends ServiceEntityRepository
         }
         return $data;
     }
+
+    public function mostrarProveedores(){
+        $data = array();
+        $connection = $this->getEntityManager()->getConnection();
+        try {
+            $body = "SELECT * FROM proveedor";
+            $parameters = [];
+
+            $statement = $connection->executeQuery($body,$parameters);
+            $results = $statement->fetchAll();
+
+            $data =  $results;
+            //$data  = 'OK';
+
+        }catch(\Exception $e){
+            $data = array('estado' => 'danger', 'mensaje' => $e->getMessage());
+        }
+        return $data;
+    }
+
 }

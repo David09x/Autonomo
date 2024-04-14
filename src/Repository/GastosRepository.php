@@ -63,4 +63,23 @@ class GastosRepository extends ServiceEntityRepository
         }
         return $data;
     }
+
+    public function agregarGastos($idProveedor,$descripcion,$precio,$fecha){
+        $data = array();
+        $connection = $this->getEntityManager()->getConnection();
+        try {
+            $body = "INSERT INTO gastos (idProveedor,descripcion,precio,fecha) VALUES (:idProveedor,:descripcion,:precio,:fecha)";
+            $parameters = ['idProveedor' => $idProveedor,'descripcion' => $descripcion,'precio' => $precio,'fecha' => $fecha];
+
+            $statement = $connection->executeQuery($body,$parameters);
+            $results = $statement->fetchAll();
+
+            $data =  $results;
+            $data = "ok";
+
+        }catch(\Exception $e){
+            $data = array('estado' => 'danger', 'mensaje' => $e->getMessage());
+        }
+        return $data;
+    }
 }

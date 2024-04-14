@@ -312,4 +312,36 @@ class AutonomoController extends AbstractController
         
         return new JsonResponse($response);
     }
+
+    #[Route('/mostrarProveedoresLista', name: 'buscar-proveedores')]
+    public function mostrarProveedores(ManagerRegistry $doctrine){
+        $Proveedores= $doctrine->getRepository(Proveedor::class)->mostrarProveedores();
+
+        $response = [
+                 'Proveedores' => $Proveedores
+             ];
+         
+         return new JsonResponse($response);
+    }
+
+    #[Route('/agregarGastos/{idProveedor}/{descripcion}/{precio}/{fecha}' , name: 'agregar-gastos')]
+    public function agregarGastos(ManagerRegistry  $doctrine,$idProveedor,$descripcion,$precio,$fecha): JsonResponse{
+        $convertirFecha2 = $this->obtenerFecha($fecha);
+        $gastos = $doctrine->getRepository(Gastos::class)->agregarGastos($idProveedor,$descripcion,$precio, $convertirFecha2['fecha']);
+
+        if($gastos == "ok"){
+            $response = [
+                'status' => "se agrego",
+                'convertirFecha2' => $convertirFecha2
+            ];
+        }else{
+            $response = [
+                'status' => "no se agrego",
+                'convertirFecha2' => $convertirFecha2
+            ];
+        }
+
+        return new JsonResponse($response);
+    }
+
 }
