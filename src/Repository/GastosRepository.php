@@ -82,4 +82,23 @@ class GastosRepository extends ServiceEntityRepository
         }
         return $data;
     }
+
+    public function buscarGastos($fecha,$fecha2){
+        $data = array();
+        $connection = $this->getEntityManager()->getConnection();
+        try {
+            $body = "SELECT proveedor.nombre ,descripcion,precio,fecha FROM `gastos` inner JOIN proveedor WHERE gastos.idProveedor = proveedor.id AND fecha BETWEEN :fecha AND :fecha2 ";
+            $parameters = ['fecha' => $fecha,'fecha2' => $fecha2];
+
+            $statement = $connection->executeQuery($body,$parameters);
+            $results = $statement->fetchAll();
+
+            $data =  $results;
+
+        }catch(\Exception $e){
+            $data = array('estado' => 'danger', 'mensaje' => $e->getMessage());
+        }
+        return $data;
+
+    }
 }

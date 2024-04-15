@@ -91,7 +91,7 @@ class Gastos
     }
     public function __toArray(){
         $response = [
-            'idProovedor' => $this->idProveedor->getId(),
+            'idProovedor' => $this->getIdProveedor(),
             'descripcion' => $this->getDescripcion(),
             'fecha' => $this->getFecha(),
             'precio' => $this->getPrecio()

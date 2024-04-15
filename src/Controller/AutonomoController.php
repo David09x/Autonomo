@@ -344,4 +344,52 @@ class AutonomoController extends AbstractController
         return new JsonResponse($response);
     }
 
+    #[Route('/mostrarGastosFechas/{fecha}/{fecha2}', name: 'mostrar-gastos-fechas')]
+    public function mostrarGastosFecha(ManagerRegistry $doctrine,$fecha,$fecha2): JsonResponse{
+        $convertirFecha = $this->obtenerFecha($fecha);
+        $convertirFecha2 = $this->obtenerFecha($fecha2);
+        
+        $obtenerGastos = $doctrine->getRepository(Gastos::class)->buscarGastos($convertirFecha['fecha'], $convertirFecha2['fecha']);
+
+        
+        if(count($obtenerGastos) > 0){
+
+            $response = [
+                'ok' => true,
+                'gastos' => $obtenerGastos
+            ];
+        }else{
+            $response = [
+                'status' => false,
+                'convertirFecha2' => $obtenerGastos
+            ];
+        }
+
+        return new JsonResponse($response);
+    }
+
+    #[Route('/mostrarBeneficiosFechas/{fecha}/{fecha2}', name: 'mostrar-beneficios-fechas')]
+    public function mostrarBeneficiosFecha(ManagerRegistry $doctrine,$fecha,$fecha2): JsonResponse{
+        $convertirFecha = $this->obtenerFecha($fecha);
+        $convertirFecha2 = $this->obtenerFecha($fecha2);
+        
+        $obtenerBeneficios = $doctrine->getRepository(Citas::class)->mostrarCitaFechas($convertirFecha['fecha'], $convertirFecha2['fecha']);
+
+        
+        if(count($obtenerBeneficios) > 0){
+
+            $response = [
+                'ok' => true,
+                'beneficios' => $obtenerBeneficios
+            ];
+        }else{
+            $response = [
+                'status' => false,
+                'convertirFecha2' => $obtenerBeneficios
+            ];
+        }
+
+        return new JsonResponse($response);
+    }
+
 }
