@@ -87,7 +87,8 @@ class GastosRepository extends ServiceEntityRepository
         $data = array();
         $connection = $this->getEntityManager()->getConnection();
         try {
-            $body = "SELECT proveedor.nombre ,descripcion,precio,fecha FROM `gastos` inner JOIN proveedor WHERE gastos.idProveedor = proveedor.id AND fecha BETWEEN :fecha AND :fecha2 ";
+            $body = "SELECT proveedor.nombre ,descripcion,precio,fecha FROM `gastos` inner JOIN proveedor
+             WHERE gastos.idProveedor = proveedor.id AND fecha BETWEEN :fecha AND :fecha2  ORDER BY fecha ASC";
             $parameters = ['fecha' => $fecha,'fecha2' => $fecha2];
 
             $statement = $connection->executeQuery($body,$parameters);

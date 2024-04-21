@@ -352,7 +352,7 @@ class AutonomoController extends AbstractController
         $obtenerGastos = $doctrine->getRepository(Gastos::class)->buscarGastos($convertirFecha['fecha'], $convertirFecha2['fecha']);
 
         
-        if(count($obtenerGastos) > 0){
+        if(count($obtenerGastos) !=  null){
 
             $response = [
                 'ok' => true,
@@ -360,7 +360,7 @@ class AutonomoController extends AbstractController
             ];
         }else{
             $response = [
-                'status' => false,
+                'ok' => false,
                 'convertirFecha2' => $obtenerGastos
             ];
         }
@@ -373,8 +373,8 @@ class AutonomoController extends AbstractController
         $convertirFecha = $this->obtenerFecha($fecha);
         $convertirFecha2 = $this->obtenerFecha($fecha2);
         
-        $obtenerBeneficios = $doctrine->getRepository(Citas::class)->mostrarCitaFechas($convertirFecha['fecha'], $convertirFecha2['fecha']);
 
+        $obtenerBeneficios = $doctrine->getRepository(Citas::class)->mostrarCitaFechas($convertirFecha['fecha'], $convertirFecha2['fecha']);
         
         if(count($obtenerBeneficios) > 0){
 
@@ -384,7 +384,7 @@ class AutonomoController extends AbstractController
             ];
         }else{
             $response = [
-                'status' => false,
+                'ok' => false,
                 'convertirFecha2' => $obtenerBeneficios
             ];
         }
