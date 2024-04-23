@@ -392,4 +392,16 @@ class AutonomoController extends AbstractController
         return new JsonResponse($response);
     }
 
+    #[Route('/borrarCita/{id}', name: 'borrar-Cita')]
+    public function borrarCitaCitada(ManagerRegistry  $doctrine,$id): JsonResponse{
+
+       $doctrine->getRepository(Citas::class)->borrarCita($id);
+
+        $response = "se borro la cita";
+
+        return new JsonResponse($response);
+
+    }
+
+
 }

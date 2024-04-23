@@ -73,7 +73,7 @@ class CitasRepository extends ServiceEntityRepository
         $data = array();
         $connection = $this->getEntityManager()->getConnection();
         try {
-            $body = "SELECT cliente.nombre, citas.hora ,  servicios.tipo , servicios.precio FROM citas INNER JOIN cliente ON cliente.id = citas.idCliente 
+            $body = "SELECT citas.id ,cliente.nombre, citas.hora ,  servicios.tipo , servicios.precio FROM citas INNER JOIN cliente ON cliente.id = citas.idCliente 
             INNER JOIN servicios ON servicios.id = citas.idServicio WHERE citas.fecha = :fecha ORDER BY citas.hora ASC";
             $parameters = ['fecha' => $fecha];
 
@@ -126,4 +126,22 @@ class CitasRepository extends ServiceEntityRepository
         return $data;
     }
 
+    public function borrarCita($id){
+        $data = array();
+        $connection = $this->getEntityManager()->getConnection();
+        try {
+            $body = "DELETE FROM citas WHERE id = :id";
+            $parameters = ['id' => $id ];
+
+            $statement = $connection->executeQuery($body,$parameters);
+            $results = $statement->fetchAll();
+
+            $data =  $results;
+
+        }catch(\Exception $e){
+            $data = array('estado' => 'danger', 'mensaje' => $e->getMessage());
+        }
+        return $data;
+    }
+    
 }
