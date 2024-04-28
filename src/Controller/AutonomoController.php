@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Entity\Category;
@@ -12,6 +13,7 @@ use App\Entity\Gastos;
 use App\Entity\Cliente;
 use App\Entity\Servicios;
 use App\Entity\Citas;
+use App\Entity\Usuarios;
 
 class AutonomoController extends AbstractController
 {
@@ -402,6 +404,51 @@ class AutonomoController extends AbstractController
         return new JsonResponse($response);
 
     }
+
+    #[Route('/crearToken', name: 'crear-token')]
+    public function crearToken(ManagerRegistry  $doctrine): JsonResponse{
+        $caracteres = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+        'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+        '@', '#', '?', '¿', '!', '¡'];
+
+        $longitud = count($caracteres);
+        $token = '';
+
+      
+        for ($i = 0; $i < 30; $i++) {
+        $indice = rand(0, $longitud - 1);
+        $token .= $caracteres[$indice];
+        }
+
+        return new JsonResponse(['token' => $token]);
+
+    }
+
+    
+    #[Route('/buscar-usuario', name: 'buscar-usuario', methods: ['POST'])]
+public function buscarUsuario(Request $request,ManagerRegistry $doctrine): JsonResponse
+{
+
+    $content = $request->getContent();
+    $data = json_decode($content, true);
+    $idUsuario = $data['idUsuario'];
+    $password = $data['password'];
+    $usuario = $doctrine->getRepository(Usuarios::class)->buscarUsuario($idUsuario, $password);
+
+    if($usuario){
+        $response = [
+            'status' => true,
+            'token' => $usuario[0]['token']
+        ];
+    }else{
+        $response = [
+            'status' => false,
+            'descripcion' => "credenciales inválidas"
+        ];
+    }
+
+    return new JsonResponse($response);
+}
 
 
 }
